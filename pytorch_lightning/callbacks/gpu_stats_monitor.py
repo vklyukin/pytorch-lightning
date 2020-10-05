@@ -117,7 +117,7 @@ class GPUStatsMonitor(Callback):
         self._snap_inter_step_time = None
 
     @rank_zero_only
-    def on_train_batch_start(self, trainer, pl_module, batch, batch_idx, dataloader_idx):
+    def on_train_batch_start(self, trainer, pl_module, *_):
         if self._log_stats.intra_step_time:
             self._snap_intra_step_time = time.time()
 
@@ -132,11 +132,10 @@ class GPUStatsMonitor(Callback):
             # First log at beginning of second step
             logs['batch_time/inter_step (ms)'] = (time.time() - self._snap_inter_step_time) * 1000
 
-
         trainer.logger.log_metrics(logs, step=trainer.global_step)
 
     @rank_zero_only
-    def on_train_batch_end(self, trainer, pl_module, batch, batch_idx, dataloader_idx):
+    def on_train_batch_end(self, trainer, pl_module, *_):
         if self._log_stats.inter_step_time:
             self._snap_inter_step_time = time.time()
 
